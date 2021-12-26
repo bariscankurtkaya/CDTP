@@ -3,7 +3,7 @@ import time
 import cv2
 
 
-INPUT_FILE='/Dataset/1.jpg'
+INPUT_FILE='./Dataset/1.jpg'
 OUTPUT_FILE='./predicted.jpg'
 LABELS_FILE='../darknet/data/coco.names'
 CONFIG_FILE='../darknet/cfg/yolov3.cfg'
@@ -24,6 +24,7 @@ image = cv2.imread(INPUT_FILE)
 
 # determine only the *output* layer names that we need from YOLO
 ln = net.getLayerNames()
+print(ln)
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
 
@@ -97,129 +98,3 @@ if len(idxs) > 0:
 
 # show the output image
 cv2.imwrite("example.png", image)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-import sys
-sys.path.append('/home/baris/Github/darknet/python/')
-
-from darknet import performDetect as scan #calling 'performDetect' function from darknet.py
-"""
-
-from darknetpy.detector import Detector
-
-
-######################### FUNCTIONS  ###########################
-"""
-def detect(picPath):
-    ''' this script if you want only want get the coord '''
-    cfg='../darknet/cfg/yolov3.cfg' #change this if you want use different config
-    coco='../darknet/cfg/coco.data' #you can change this too
-    data='../darknet/yolov3.weights' #and this, can be change by you
-    test = scan(imagePath=picPath, thresh=0.25, configPath=cfg, weightPath=data, metaPath=coco, showImage=True, makeImageOnly=False, initOnly=False) #default format, i prefer only call the result not to produce image to get more performance
-
-    #until here you will get some data in default mode from alexeyAB, as explain in module.
-    #try to: help(scan), explain about the result format of process is: [(item_name, convidence_rate (x_center_image, y_center_image, width_size_box, height_size_of_box))], 
-    #to change it with generally used form, like PIL/opencv, do like this below (still in detect function that we create):
-
-    newdata = []
-    if len(test) >=2:
-        for x in test:
-            item, confidence_rate, imagedata = x
-            x1, y1, w_size, h_size = imagedata
-            x_start = round(x1 - (w_size/2))
-            y_start = round(y1 - (h_size/2))
-            x_end = round(x_start + w_size)
-            y_end = round(y_start + h_size)
-            data = (item, confidence_rate, (x_start, y_start, x_end, y_end), w_size, h_size)
-            newdata.append(data)
-
-    elif len(test) == 1:
-        item, confidence_rate, imagedata = test[0]
-        x1, y1, w_size, h_size = imagedata
-        x_start = round(x1 - (w_size/2))
-        y_start = round(y1 - (h_size/2))
-        x_end = round(x_start + w_size)
-        y_end = round(y_start + h_size)
-        data = (item, confidence_rate, (x_start, y_start, x_end, y_end), w_size, h_size)
-        newdata.append(data)
-
-    else:
-        newdata = False
-
-    return newdata
-
-"""
-
-def detectWithDarknetpy(imgPath):
-    cfg='../darknet/cfg/yolov3.cfg' #change this if you want use different config
-    coco='../darknet/cfg/coco.data' #you can change this too
-    data='../darknet/yolov3.weights' #and this, can be change by you
-    
-    detector = Detector(coco,cfg,data)
-
-    results = detector.detect(imgPath)
-    
-    print(results)
-
-
-######################### ALGORITHM  ###########################
-
-table = './Dataset/1.jpg'
-
-detectWithDarknetpy(table)
-
-"""
-checking = detect(table)
-
-for x in checking:
-    item = x[0]
-    x1, y1, x2, y2 = x[2]
-    print(item)
-    print(x1, y1, x2, y2)
-"""
