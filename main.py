@@ -53,14 +53,16 @@ def shapesDetection(img):
       
         # putting shape name at center of each shape
         if len(approx) == 3:
+            print("triangle")
             cv2.putText(img, 'Triangle', (x, y),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            print(x,y)
+
+        """
         elif len(approx) > 6:
             print("circle: ",len(approx))
             cv2.putText(img, 'circle', (x, y),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-            
-        """
         elif len(approx) == 4:
             cv2.putText(img, 'Quadrilateral', (x, y),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
@@ -90,8 +92,19 @@ def shapesDetection(img):
 imgList = ['./Dataset/1.jpg','./Dataset/2.jpg','./Dataset/3.jpg','./Dataset/4.jpg','./Dataset/5.jpg','./Dataset/6.jpg']
 
 shapesImg = cv2.imread('./Dataset/shapes.png')
+vid = cv2.VideoCapture(0)
 
-shapesDetection(shapesImg)
+while True:
+    ret, frame = vid.read()
+
+    shapesDetection(frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+vid.release()
+
+cv2.destroyAllWindows()
 
 
 """

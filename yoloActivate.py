@@ -2,8 +2,8 @@ import torch
 import cv2
 
 # Model
-model = torch.hub.load('ultralytics/yolov5', 'yolov5x', pretrained=True)
-model.classes = [0, 1, 2, 3, 4, 5, 7, 11, 15, 16, 17, 18, 19, 36, 37]
+model = torch.hub.load('ultralytics/yolov5', 'yolov5x6', pretrained=True)
+#model.classes = [0, 1, 2, 3, 4, 5, 7, 11, 15, 16, 17, 18, 19, 36, 37]
 # From camera
 vid = cv2.VideoCapture(0)
 vid2 = cv2.VideoCapture(1)
@@ -28,9 +28,9 @@ while True:
     results2.save() 
     cv2.imshow("res",frame)
     cv2.imshow("res2",frame2)
-    
-    print("results1", results.pandas().xyxy[0])
-    print("results2", results2.pandas().xyxy[0])
+
+    #print("results1", results.pandas().xyxy[0])
+    #print("results2", results2.pandas().xyxy[0])
 
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
