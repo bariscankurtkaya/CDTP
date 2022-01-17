@@ -1,6 +1,18 @@
 import torch
 import cv2
 import numpy as np
+import bluetooth
+import time
+import serial
+
+# configure the serial connections (the parameters differs on the device you are connecting to)
+
+arduino = serial.Serial(port='COM5', baudrate=115200, timeout=.1)
+def write_read(x):
+    arduino.write(bytes(x, 'utf-8'))
+    time.sleep(0.05)
+    data = arduino.readline()
+    return data
 
 # Model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5x6', pretrained=True)
@@ -9,9 +21,12 @@ model.classes = [0, 2, 7, 15, 16, 17, 18, 19, 64]
 vid = cv2.VideoCapture(0)
 #vid2 = cv2.VideoCapture(1)
 
+sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+sock.connect(("00:19:10:09:0F:33", 1))
 
-# Images
-imgs = ['https://ultralytics.com/images/zidane.jpg']  # batch of images
+
+
+value = write_read("0")
 
 while True:
     ret, frame = vid.read()
@@ -51,22 +66,30 @@ while True:
 
             #First Case
             if(classNumber == 11): #Stop sign
-                print("There is a stop sign", className) 
+                print("There is a stop sign", className)
+                value = write_read("1")
 
             #Second Case
             elif(classNumber == 0):
                 print("There is a person in the road", className)
+                value = write_read("2")
+                sock.send("W")
 
             #Third Case
             elif classNumber in [15,16,17,18,19]:
                 print("There is a animal in the road", className)
+                value = write_read("3")
+                sock.send("S")
+
 
             #Fourth Case
             elif(classNumber == 7 and (xmin + xmax) > 640 ):
+                value = write_read("4")
                 print("Tır sağa geç", className)
 
             #Fifth class
             elif(classNumber == 64):
+                value = write_read("5")
                 print("Taş var dikkat ettt", "Rock")
 
     results.save() 
@@ -86,8 +109,10 @@ while True:
         break
 
 # After the loop release the cap object
+sock.send("S")
 vid.release()
 #vid2.release()
 
 # Destroy all the windows
 cv2.destroyAllWindows()
+sock.close()
