@@ -19,7 +19,7 @@ model = torch.hub.load('ultralytics/yolov5', 'yolov5x6', pretrained=True)
 model.classes = [0, 2, 7, 15, 16, 17, 18, 19, 64]
 # From camera
 vid = cv2.VideoCapture(0)
-#vid2 = cv2.VideoCapture(1)
+vid2 = cv2.VideoCapture(1)
 
 sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 sock.connect(("00:19:10:09:0F:33", 1))
@@ -30,10 +30,9 @@ value = write_read("0")
 
 while True:
     ret, frame = vid.read()
-    #ret2, frame2 = vid2.read()
+    ret2, frame2 = vid2.read()
     
     # Inference
-    #results2 = model(frame2)
 
     # Results
     
@@ -54,7 +53,11 @@ while True:
 
 
     results = model(frame)
+    results2 = model(frame2)
+
     npResults = results.pandas().xyxy[0].to_numpy()
+    npResults2 = results2.pandas().xyxy[0].to_numpy()
+    isTwoImportant = False
 
     if(len(npResults) != 0):
         for i in range(len(npResults)):
@@ -74,6 +77,9 @@ while True:
                 print("There is a person in the road", className)
                 value = write_read("2")
                 sock.send("W")
+                time.sleep(0.5)
+                sock.send("S")
+                time.sleep(0.5)
 
             #Third Case
             elif classNumber in [15,16,17,18,19]:
@@ -91,9 +97,54 @@ while True:
             elif(classNumber == 64):
                 value = write_read("5")
                 print("Taş var dikkat ettt", "Rock")
+            
+            else:
+                isTwoImportant = True
 
-    results.save() 
-    cv2.imshow("res",frame)
+        if( isTwoImportant ):
+            if(len(npResults2) != 0):
+                for i in range(len(npResults2)):
+                    #We define the class number into the classNumber variable and class name to className
+                    classNumber = npResults2[i][5]
+                    className = npResults2[i][6]
+                    xmin = npResults2[i][0]
+                    xmax = npResults2[i][2]
+
+                    #First Case
+                    if(classNumber == 11): #Stop sign
+                        print("There is a stop sign", className)
+                        value = write_read("6")
+
+                    #Second Case
+                    elif(classNumber == 0):
+                        print("There is a person in the road", className)
+                        value = write_read("7")
+                        sock.send("W")
+                        time.sleep(0.5)
+                        sock.send("S")
+                        time.sleep(0.5)
+
+                    #Third Case
+                    elif classNumber in [15,16,17,18,19]:
+                        print("There is a animal in the road", className)
+                        value = write_read("8")
+                        sock.send("S")
+
+
+                    #Fourth Case
+                    elif(classNumber == 7 and (xmin + xmax) > 640 ):
+                        value = write_read("9")
+                        print("Tır sağa geç", className)
+
+                    #Fifth class
+                    elif(classNumber == 64):
+                        value = write_read("10")
+                        print("Taş var dikkat ettt", "Rock")
+
+    results.save()
+    results2.save() 
+    cv2.imshow("res1",frame)
+    cv2.imshow("res2",frame2)
 
     #results2.print()
     #results2.save() 

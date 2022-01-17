@@ -19,16 +19,27 @@ void loop() {
  // print the number of seconds since reset:
  lcd.clear();
  if (x == 1) {
-   lcd.print("Dur Levhasi");
+   lcd.print("1. Dur Levhasi");
  }else if (x == 2){
-   lcd.print("Insan");
+   lcd.print("1. Insan");
  }else if (x == 3){
-   lcd.print("Hayvan");
+   lcd.print("1. Hayvan");
  }else if (x == 4){
-   lcd.print("Tir");
+   lcd.print("1.Tir");
  }else if (x == 5){
-   lcd.print("Tas");
- }else{
+   lcd.print("1. Tas");
+ }else if (x == 6) {
+   lcd.print("2. Dur Levhasi");
+ }else if (x == 7){
+   lcd.print("2. Insan");
+ }else if (x == 8){
+   lcd.print("2. Hayvan");
+ }else if (x == 9){
+   lcd.print("2. Tir");
+ }else if (x == 10){
+   lcd.print("2. Tas");
+ }
+ else{
    lcd.print("Iyi Yolculuklar");
  }
 }
