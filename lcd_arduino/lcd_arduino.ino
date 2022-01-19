@@ -23,9 +23,9 @@ void loop() {
  }else if (x == 2){
    lcd.print("1. Insan");
  }else if (x == 3){
-   lcd.print("1. Hayvan");
+   lcd.print(" Hayvan Var");
  }else if (x == 4){
-   lcd.print("1.Tir");
+   lcd.print("Tir Yanlis Serit");
  }else if (x == 5){
    lcd.print("1. Tas");
  }else if (x == 6) {

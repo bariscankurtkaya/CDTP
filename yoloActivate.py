@@ -16,7 +16,8 @@ def write_read(x):
 
 # Model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5x6', pretrained=True)
-model.classes = [0, 2, 7, 15, 16, 17, 18, 19, 64]
+model.classes = [2, 7, 15, 16, 17, 18, 19, 64]
+model.conf = 0.70
 # From camera
 vid = cv2.VideoCapture(0)
 vid2 = cv2.VideoCapture(1)
@@ -47,7 +48,7 @@ while True:
     1. name stop sign varsa dikkat kaza var ya da yavaşlayın
     2. name insan yolda insan var yavaşlayın
     3. name horse, dog, cat, cow, sheep ise yolda hayvan var yavaşla
-    4. name tır ise ve sağdaysa tır bey sol şeritten sağa geçin
+    4. name tır ise ve sağdaysa tır sol şeritten sağa geçin
     5. name mouse opsiyonel taş
     """
 
@@ -57,15 +58,15 @@ while True:
 
     npResults = results.pandas().xyxy[0].to_numpy()
     npResults2 = results2.pandas().xyxy[0].to_numpy()
-    isTwoImportant = False
-
-    if(len(npResults) != 0):
-        for i in range(len(npResults)):
+    isTwoImportant = True
+    print("Girdi")
+    if(len(npResults2) != 0):
+        for i in range(len(npResults2)):
             #We define the class number into the classNumber variable and class name to className
-            classNumber = npResults[i][5]
-            className = npResults[i][6]
-            xmin = npResults[i][0]
-            xmax = npResults[i][2]
+            classNumber = npResults2[i][5]
+            className = npResults2[i][6]
+            xmin = npResults2[i][0]
+            xmax = npResults2[i][2]
 
             #First Case
             if(classNumber == 11): #Stop sign
@@ -74,41 +75,56 @@ while True:
 
             #Second Case
             elif(classNumber == 0):
+                """
                 print("There is a person in the road", className)
                 value = write_read("2")
                 sock.send("W")
-                time.sleep(0.5)
+                time.sleep(1)
                 sock.send("S")
-                time.sleep(0.5)
+                time.sleep(2)
+                """
 
             #Third Case
             elif classNumber in [15,16,17,18,19]:
-                print("There is a animal in the road", className)
+                print("AT at AT")
                 value = write_read("3")
+                sock.send("W")
+                time.sleep(2)
                 sock.send("S")
+                time.sleep(3)
 
 
             #Fourth Case
             elif(classNumber == 7 and (xmin + xmax) > 640 ):
                 value = write_read("4")
+                sock.send("W")
+                print("w")
+                time.sleep(3)
+                print("s")
+                sock.send("S")
+                time.sleep(3)
                 print("Tır sağa geç", className)
 
             #Fifth class
             elif(classNumber == 64):
                 value = write_read("5")
                 print("Taş var dikkat ettt", "Rock")
+                sock.send("W")
+                time.sleep(1.5)
+                sock.send("S")
+                time.sleep(3)
+
+
             
-            else:
-                isTwoImportant = True
 
         if( isTwoImportant ):
-            if(len(npResults2) != 0):
-                for i in range(len(npResults2)):
+            if(len(npResults) != 0):
+                for i in range(len(npResults)):
                     #We define the class number into the classNumber variable and class name to className
-                    classNumber = npResults2[i][5]
-                    className = npResults2[i][6]
-                    xmin = npResults2[i][0]
-                    xmax = npResults2[i][2]
+                    classNumber = npResults[i][5]
+                    className = npResults[i][6]
+                    xmin = npResults[i][0]
+                    xmax = npResults[i][2]
 
                     #First Case
                     if(classNumber == 11): #Stop sign
@@ -128,7 +144,10 @@ while True:
                     elif classNumber in [15,16,17,18,19]:
                         print("There is a animal in the road", className)
                         value = write_read("8")
+                        sock.send("W")
+                        time.sleep(4)
                         sock.send("S")
+                        time.sleep(5)
 
 
                     #Fourth Case
@@ -140,6 +159,10 @@ while True:
                     elif(classNumber == 64):
                         value = write_read("10")
                         print("Taş var dikkat ettt", "Rock")
+                        sock.send("W")
+                        time.sleep(4.5)
+                        sock.send("S")
+                        time.sleep(3)
 
     results.save()
     results2.save() 
@@ -161,6 +184,7 @@ while True:
 
 # After the loop release the cap object
 sock.send("S")
+sock.send("K")
 vid.release()
 #vid2.release()
 
